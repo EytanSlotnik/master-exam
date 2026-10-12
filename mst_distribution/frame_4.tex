@@ -1,0 +1,19 @@
+\begin{frame}{Random MST Distribuion}
+    \begin{definition}[MST Distribuion]
+        $T\sim \MST(G)$ Where $T=\MST(G,U)$ where $U_e$ are i.i.d. continus RVs.
+    \end{definition}
+    \begin{block}{Why MST and not Uniform?}
+    This ditribuion seem to be harder for bad WCBs
+    \begin{itemize}
+        \item Canonical result: $\Theta(n^{1/3})$ diameter in RMST vs. $\Theta(n^{1/2})$ in UST
+        \item Seems to play nice with notions of avegare stretch (nothing conctre thogh)
+    \end{itemize}
+    \end{block}
+
+    \begin{block}{probabiliets is counting posets}
+        Recall the cut condtion i.e. $e\in T\iff e\leq f \quad \forall f\in \cut_T(e)$, this translates into a poset $P_T$ msking the probibility $\operatorname{LE}(P_T)/|E|! $
+    \end{block}
+    \begin{theorem}[Lyines=Peres Formula]
+        Using the fact the the $P_T$ is a 2-height poset simple combinatorics give us $p(T)=\sum_{\sigma\in S(T)}\prod_{i=1}^{n-1}\frac{1}{\cut_T(\{\sigma_1\ldots \sigma_i\})}=(n-1)!\mathbb{E}\left[\prod_{i=1}^{n-1}\frac{1}{\cut_T(\{\sigma_1\ldots \sigma_i\})}\right]$
+    \end{theorem}
+\end{frame}
