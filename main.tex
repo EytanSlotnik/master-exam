@@ -1,0 +1,896 @@
+% !TeX program = xelatex
+% Short Cycle Bases - research talk / thesis defense
+% Compile twice: xelatex -interaction=nonstopmode -halt-on-error main.tex
+\documentclass[11pt,aspectratio=169]{beamer}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,calc,positioning,shapes.geometric,fit,backgrounds,decorations.pathreplacing}
+\usepackage{booktabs}
+\usepackage{fontspec}
+\defaultfontfeatures{Ligatures=TeX}
+\IfFontExistsTF{Arimo}{\setsansfont{Arimo}}{\setsansfont{DejaVu Sans}}
+\IfFontExistsTF{DejaVu Sans Mono}{\setmonofont{DejaVu Sans Mono}}{\setmonofont{FreeMono}}
+\usefonttheme{professionalfonts}
+\definecolor{thesisNavy}{HTML}{17324E}
+\definecolor{thesisTeal}{HTML}{0D8C92}
+\definecolor{thesisOrange}{HTML}{C46D36}
+\definecolor{thesisRed}{HTML}{A73B44}
+\definecolor{thesisGray}{HTML}{586775}
+\definecolor{thesisPale}{HTML}{F0F5F7}
+\setbeamercolor{normal text}{fg=thesisNavy,bg=white}
+\setbeamercolor{frametitle}{fg=thesisNavy}
+\setbeamercolor{title}{fg=thesisNavy}
+\setbeamercolor{structure}{fg=thesisTeal}
+\setbeamercolor{block title}{fg=white,bg=thesisNavy}
+\setbeamercolor{block body}{fg=thesisNavy,bg=thesisPale}
+\setbeamercolor{alerted text}{fg=thesisOrange}
+\setbeamerfont{frametitle}{series=\bfseries,size=\Large}
+\setbeamerfont{title}{series=\bfseries,size=\LARGE}
+\setbeamerfont{block title}{series=\bfseries,size=\normalsize}
+\setbeamerfont{block body}{size=\normalsize}
+\setbeamersize{text margin left=.84cm,text margin right=.84cm}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{itemize items}[circle]
+\setbeamertemplate{headline}{}
+\setbeamertemplate{frametitle}{\vspace{.23cm}\insertframetitle\par\vspace{.13cm}\textcolor{thesisTeal}{\rule{\textwidth}{.65pt}}\vspace{-.23cm}}
+\setbeamertemplate{footline}{%
+ \leavevmode\vbox{\hbox to \paperwidth{%
+  \hspace{.84cm}{\scriptsize\color{thesisGray}Short Cycle Bases}%
+  \hfil{\scriptsize\color{thesisGray}\insertsectionhead}%
+  \hspace{.35cm}{\scriptsize\color{thesisTeal}\insertframenumber}%
+  \hspace{.84cm}}\vskip.17cm}}
+\setbeamertemplate{blocks}[rounded][shadow=false]
+\setlength{\parskip}{.12em}
+\newcommand{\key}[1]{\textcolor{thesisTeal}{\textbf{#1}}}
+\newcommand{\labelp}[1]{{\bfseries\color{thesisTeal}#1\quad}}
+\newcommand{\thesissrc}[1]{} % source references retained in .tex, hidden on slides
+\newcommand{\girth}{\operatorname{girth}}
+\newcommand{\WCB}{\operatorname{WCB}}
+\newcommand{\MCB}{\operatorname{MCB}}
+\newcommand{\as}{\operatorname{as}}
+\newcommand{\cut}{\operatorname{cut}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\MST}{\operatorname{MST}}
+\newcommand{\Ftwo}{\mathbb F_2}
+\newcommand{\prob}{\mathbb P}
+\newcommand{\expect}{\mathbb E}
+\newcommand{\ord}{\mathcal O}
+\input{figures/diagrams.tex}
+\input{figures/spiral_frames.tex}
+\title[Short Cycle Bases]{Short Cycle Bases}
+\subtitle{Low Average Stretch and the Minimum Spanning Tree Distribution}
+\author{Eytan Slotnik}
+\institute{The Hebrew University of Jerusalem\\Advisor: Prof. Sasha Sodin}
+\date{Master's thesis presentation, October 2026}
+
+\begin{document}
+
+
+\section{Setup}
+
+
+% Source deck slide 1
+\begin{frame}[plain]
+ \vspace{1.1cm}
+ {\color{thesisTeal}\rule{1.8cm}{3pt}}\par\vspace{.42cm}
+ {\LARGE\bfseries Short Cycle Bases}\par\vspace{.22cm}
+ {\large Low Average Stretch and the\\Minimum Spanning Tree Distribution}\par
+ \vspace{1.35cm}
+ {\normalsize Eytan Slotnik}\par
+ {\small The Hebrew University of Jerusalem\quad |\quad Prof. Sasha Sodin}\par
+ \vspace{.6cm}{\color{thesisGray}\small October 2026}
+\end{frame}
+
+
+% Source deck slide 2
+\begin{frame}{The guiding question}
+ \centering
+ {\Large\bfseries How restrictive is a short cycle basis?}\par\vspace{.23cm}
+ A basis is \key{short} if its mean cycle length stays bounded as the graph grows.
+ \vspace{.40cm}
+ \begin{columns}[T,onlytextwidth]
+  \begin{column}{.31\textwidth}
+   \begin{block}{Create}
+    Can we add edges to obtain short cycles efficiently?
+   \end{block}
+   \centering\small Chapter 2: hardness
+  \end{column}
+  \begin{column}{.31\textwidth}
+   \begin{block}{Count}
+    How many bounded-degree graphs admit short bases?
+   \end{block}
+   \centering\small Chapter 3: stretch and entropy
+  \end{column}
+  \begin{column}{.31\textwidth}
+   \begin{block}{Sample}
+    How likely is a given spanning tree under random weights?
+   \end{block}
+   \centering\small Chapter 4: cut probabilities
+  \end{column}
+ \end{columns}
+ \vspace{.30cm}
+ \small\textcolor{thesisGray}{Spanning trees and their fundamental cycles/cuts connect the structural and probabilistic viewpoints.}
+\end{frame}
+
+
+% Source deck slide 3
+\begin{frame}{Cycle bases: a small exact example}
+ \begin{columns}[c,onlytextwidth]
+  \begin{column}{.54\textwidth}
+   \begin{block}{Cycle space}
+     \[\mathcal C(G)=\ker_{\mathbb F_2}A_G,\qquad \nu(G)=|E|-|V|+1.\]
+     Cycles add by symmetric difference ($\oplus$).
+   \end{block}
+   \begin{block}{Length of a basis}
+     \[w(B)=\sum_{C\in B}|C|,\qquad \MCB(G)=\min_B w(B).\]
+     Short means $w(B)/\nu(G)=O(1)$.
+   \end{block}
+  \end{column}
+  \begin{column}{.43\textwidth}
+   \centering\resizebox{.75\linewidth}{!}{\ShortBasisFig}
+  \end{column}
+ \end{columns}
+ \vspace{.1cm}
+ \small\key{Intuition:} the weight records how locally the entire cycle space can be generated.
+ \thesissrc{Chapter 1, preliminaries}
+\end{frame}
+
+
+% Source deck slide 4
+\begin{frame}{Three notions of cycle basis}
+ \begin{block}{Fundamental (FCB)}
+ Choose a spanning tree $T$. For each $e=uv\notin T$, the unique cycle is $e\cup P_T(u,v)$.
+ \end{block}
+ \begin{block}{Weakly fundamental (WCB)}
+ The cycles can be ordered so that every cycle introduces a new edge. Earlier non-tree edges may be reused.
+ \end{block}
+ \begin{block}{General / minimum (CB / MCB)}
+ There need not be a tree certificate or a revealing order; an MCB minimizes total length among all bases.
+ \end{block}
+ \vspace{.1cm}
+ \[\boxed{\mathrm{FCB}\subsetneq\mathrm{WCB}\subsetneq\mathrm{CB}}\]
+ \small\key{Structural difference:} a WCB still has an ordered certificate; a general MCB need not.
+ \thesissrc{Chapter 1, definitions}
+\end{frame}
+
+
+% Source deck slide 5
+\begin{frame}{The two structural problems}
+ \begin{block}{Counting (open for MCB)}
+ For fixed $d,\alpha$, is the number of \emph{unlabeled} $d$-regular $n$-vertex graphs with $\MCB(G)\le\alpha n$ at most $e^{O(n)}$?
+ \end{block}
+ \begin{block}{Embedding (open for all bounded-degree graphs)}
+ Is every bounded-degree $G$ a subgraph of some $H$ with
+ \[|V(H)|\le\beta|V(G)|,\quad \Delta(H)\le d',\quad \MCB(H)\le\alpha|V(G)|?\]
+ \end{block}
+ \vspace{.2cm}
+ \key{Reason to care:} an exponential host count would severely limit how many bounded-degree graphs have such extensions.
+ \thesissrc{Chapter 1, Open Problems 1 and 2}
+\end{frame}
+
+
+\section{Chapter 2: algorithmic hardness}
+
+
+% Source deck slide 6
+\begin{frame}{Chapter 2: edge addition is hard}
+ \begin{block}{Triangle-Basis Completion (TBC)}
+ Minimize $|K|$ subject to $G+K$ having a cycle basis consisting only of triangles.
+ \end{block}
+ \begin{block}{MCB-Minimizing Edge Addition (MMEA)}
+ For fixed $k$, choose $|K|=k$ minimizing $\MCB(G+K)$.
+ \end{block}
+ \[\boxed{\mathrm{TBC}\text{ is APX-hard}\quad\Longrightarrow\quad\mathrm{MMEA}\text{ is NP-hard}}\]
+ \small\key{Reduction idea:} force an added edge at an endpoint of every original edge, as in Vertex Cover. TBC reduces to MMEA by testing all budgets $k$.
+ \thesissrc{Chapter 2, Theorem 2.3.14}
+\end{frame}
+
+
+% Source deck slide 7
+\begin{frame}{Hardness source: restricted Vertex Cover}
+ \labelp{Source} Minimum Vertex Cover on 2-partitions of cubic graphs is APX-hard.
+ \[ \mathrm{VC}(G)=\min\{|C|: C\subseteq V,\ \forall uv\in E,\ \{u,v\}\cap C\ne\varnothing\}.\]
+ \begin{center}
+  \resizebox{.63\textwidth}{!}{\TwoPartitionFig}
+ \end{center}
+ \small Each edge is replaced by a path of length \(3\); the new vertices have degree \(2\). The source graphs are triangle-free and \(C_4\)-free.
+ \thesissrc{Figure 2.1, \S2.1}
+\end{frame}
+
+
+% Source deck slide 8
+\begin{frame}{What an all-triangle basis must witness}
+ Fix a spanning tree $T$, $N=E(G)\setminus E(T)$.
+ \begin{block}{Cycle-space duality}
+ A set of triangles spans $\mathcal C(G)$ if and only if
+ \[\forall 0\neq S\in\mathbb F_2^N,\quad \exists\,\triangle:\ \langle S,\triangle|_N\rangle=1.\]
+ \end{block}
+ \vspace{.2cm}
+ \labelp{Use $S=\mathbf e_{uv}$} A triangle basis forces a triangle through the non-tree edge $uv$.
+ \vspace{.12cm}
+ \labelp{Hardness gadget} Construct a graph in which the edge $uv$ belongs to a $4$-cycle, but to \emph{no triangle}. Some completion edge must then touch $u$ or $v$.
+ \thesissrc{Proposition 2.2.2 and \S2.3}
+\end{frame}
+
+
+% Source deck slide 9
+\begin{frame}{The reduction \(f\): from \(G\) to \(f_0(G)\)}
+ \begin{columns}[T,onlytextwidth]
+  \begin{column}{.48\textwidth}
+   \begin{center}\resizebox{.78\linewidth}{!}{\ReductionPanel{0}}\end{center}
+   \centering\small Input \(G=P_4\)
+  \end{column}
+  \begin{column}{.48\textwidth}
+   \begin{center}\resizebox{.78\linewidth}{!}{\ReductionPanel{1}}\end{center}
+   \centering\small Add \(V'\); for each \(uv\in E(G)\), add \(u'v',u'v,uv'\).
+  \end{column}
+ \end{columns}
+ \vspace{.1cm}
+ \labelp{Special FCB} Choose a tree in which every original vertex \(v\in V\) is a leaf; then each fundamental cycle contains at most one vertex of \(V\).
+ \thesissrc{Figure 2.2, construction steps 1--3}
+\end{frame}
+
+
+% Source deck slide 10
+\begin{frame}{The reduction \(f\): wheels and original edges}
+ \begin{columns}[T,onlytextwidth]
+  \begin{column}{.49\textwidth}
+   \begin{center}\resizebox{.78\linewidth}{!}{\ReductionPanel{2}}\end{center}
+   \centering\small \(f_1(G)\): add a wheel over every FCB cycle of \(f_0(G)\).
+  \end{column}
+  \begin{column}{.49\textwidth}
+   \begin{center}\resizebox{.78\linewidth}{!}{\ReductionPanel{3}}\end{center}
+   \centering\small \(f(G)\): restore original edges \(uv\in E(G)\) (orange).
+  \end{column}
+ \end{columns}
+ \vspace{.08cm}
+ \labelp{Purpose} Wheels create a triangle basis in \(f_1(G)\); restored edges introduce exactly the desired \(4\)-cycles.
+ \thesissrc{Figure 2.2, construction steps 4--9}
+\end{frame}
+
+
+% Source deck slide 11
+\begin{frame}{The whole reduction in one local picture}
+ \begin{columns}[c,onlytextwidth]
+  \begin{column}{.49\textwidth}
+   \centering\resizebox{.81\linewidth}{!}{\FourCycleGadget}
+   \par\scriptsize Dashed $uu'$ is the possible completion edge.
+  \end{column}
+  \begin{column}{.49\textwidth}
+   \begin{block}{Before completion}
+    The restored original edge $uv$ has no triangle. Its shortest containing cycle is $C_{uv}$, of length $4$.
+   \end{block}
+   \begin{block}{After adding $uu'$}
+    \[ C_{uv}=(u,u',v)\oplus(u,u',v'). \]
+    The two triangles replace the $4$-cycle.
+   \end{block}
+  \end{column}
+ \end{columns}
+ \small\key{Key:} one added $uu'$ repairs all original edges incident to $u$.
+ \thesissrc{Lemmas 2.3.2--2.3.3; Figure 2.2}
+\end{frame}
+
+
+% Source deck slide 12
+\begin{frame}{Why the wheel layer has a triangle basis}
+ \begin{columns}[c,onlytextwidth]
+  \begin{column}{.40\textwidth}
+   \begin{center}\resizebox{.84\linewidth}{!}{\WheelFig}\end{center}
+  \end{column}
+  \begin{column}{.57\textwidth}
+   For every FCB cycle \(C\), add a hub \(r_C\) adjacent to all its vertices.
+   \begin{enumerate}
+    \item The \(|C|\) rim triangles contribute \(|C|-1\) new spokes and one new pivot edge.
+    \item A pivot-edge ordering proves independence.
+    \item Their number equals \(\nu(f_1(G))\).
+   \end{enumerate}
+  \end{column}
+ \end{columns}
+ \vspace{.15cm}
+ \[\MCB(f(G))=3\nu(f_1(G))+4|E(G)|.\]
+ \small No restored edge \(uv\) lies in a triangle: that would create a triangle in the original \(G\).
+ \thesissrc{Lemma 2.3.2}
+\end{frame}
+
+
+% Source deck slide 13
+\begin{frame}{From a vertex cover to a completion}
+ \begin{columns}[c,onlytextwidth]
+  \begin{column}{.48\textwidth}
+   \begin{center}\resizebox{.88\linewidth}{!}{\FourCycleGadget}\end{center}
+  \end{column}
+  \begin{column}{.5\textwidth}
+   Take a vertex cover \(C\subseteq V(G)\). Add
+   \[ K_C=\{vv':v\in C\}.\]
+   Every \(uv\in E(G)\) has an endpoint, say \(u\), in \(C\). The added \(uu'\) splits \(C_{uv}\) into triangles.
+  \end{column}
+ \end{columns}
+ \vspace{.06cm}
+ \[\operatorname{OPT}_{\mathrm{TBC}}(f(G))\le |C|.\]
+ \thesissrc{Lemma 2.3.3}
+\end{frame}
+
+
+% Source deck slide 14
+\begin{frame}{The reverse direction begins with a cover}
+ Suppose $K$ is any feasible triangle-basis completion. Let
+ \[ C_K=V(G)\cap\bigcup_{xy\in K}\{x,y\}. \]
+ \begin{block}{Witness argument}
+ For every original $uv\in E(G)$, there must be a triangle containing $uv$ in $f(G)+K$. Since no such triangle exists in $f(G)$, some edge of $K$ touches $u$ or $v$.
+ \end{block}
+ \[\boxed{C_K\text{ is a vertex cover of }G}.\]
+ \labelp{But} $|C_K|\le|K|$ can fail: a tree component of the added-edge graph lying entirely inside the original layer has one extra vertex.
+ \thesissrc{Lemma 2.3.5}
+\end{frame}
+
+
+% Source deck slide 15
+\begin{frame}{The hard step: removing the extra vertices}
+ \begin{columns}[c,onlytextwidth]
+  \begin{column}{.46\textwidth}
+   \centering\resizebox{.95\linewidth}{!}{\ExcessTreeFig}
+  \end{column}
+  \begin{column}{.52\textwidth}
+   Let $\ell$ count tree components of $(V(f(G)),K)$ lying wholly in $V(G)$.
+   \[|C_K|\le|K|+\ell.\]
+   \labelp{Goal} Delete one covered vertex per such component.
+  \end{column}
+ \end{columns}
+ \vspace{.15cm}
+ \begin{block}{Why the technical lemmas are needed}
+ A leaf is a natural deletion candidate, but deleting adjacent leaves of different components might uncover an edge of $G$.
+ \end{block}
+ \small Normalize single-edge components, remove pairs when necessary, and protect an adjacent candidate in the next component.
+ \thesissrc{Lemmas 2.3.6--2.3.12}
+\end{frame}
+
+
+% Source deck slide 20
+\begin{frame}{Reverse map: protected leaf removal}
+ \begin{columns}[c,onlytextwidth]
+  \begin{column}{.51\textwidth}
+   \centering\resizebox{.98\linewidth}{!}{\PairedRemovalFig}
+   \par\small $K$-components are dashed; solid edges belong to $G$.
+  \end{column}
+  \begin{column}{.47\textwidth}
+   \labelp{Normalize} Eliminate size-two components inside $V(G)$ without increasing $|K|$.
+   \vspace{.08cm}
+   \labelp{Paired phase} When two leaves of $A_0$ meet a leaf of $A_1$, remove the two leaves and process both components.
+   \vspace{.08cm}
+   \labelp{Final phase} Remove one unprotected leaf per remaining component.
+  \end{column}
+ \end{columns}
+ \vspace{.22cm}
+ \[\boxed{|g(K)|\le |C_K|-\ell\le |K|}.\]
+ \small The degree-two/degree-three and $C_4$-free lemmas justify every removal (technical slides in appendix).
+ \thesissrc{Lemmas 2.3.6--2.3.12, Algorithms 2--5}
+\end{frame}
+
+
+% Source deck slide 21
+\begin{frame}{The conclusion is stronger than hardness alone}
+ \begin{block}{Two polynomial-time maps}
+ Every vertex cover $C$ yields $K_C=\{vv':v\in C\}$ with $|K_C|=|C|$.
+
+ Every feasible completion $K$ yields a vertex cover $g(K)$ with $|g(K)|\le|K|$.
+ \end{block}
+ \[\boxed{\operatorname{OPT}_{\rm TBC}(f(G))=\operatorname{OPT}_{\rm VC}(G)}\]
+ \[ |g(K)|-\operatorname{OPT}_{\rm VC}(G)
+ \le |K|-\operatorname{OPT}_{\rm TBC}(f(G)). \]
+ \vspace{.14cm}
+ \labelp{Theorem} A strict $L$-reduction with constants $\alpha=\beta=1$ proves TBC is APX-hard. Exact MMEA would solve TBC.
+ \thesissrc{Theorems 2.3.13--2.3.14}
+\end{frame}
+
+
+\section{Chapter 3: low stretch and counting}
+
+
+% Source deck slide 22
+\begin{frame}{Feasibility: successive graph lifts}
+ \begin{block}{Definition: \(2\)-lift}
+ Replace each vertex by a pair and each edge by one of two perfect matchings between the corresponding fibers.
+ \end{block}
+ \begin{center}\resizebox{.62\textwidth}{!}{\LiftLayersFig}\end{center}
+ \labelp{Construction} A sequence \(G_0\leftarrow G_1\leftarrow\cdots\leftarrow G_m\) of \(2\)-lifts can have \(\girth(G_m)\to\infty\) while preserving the degree.
+ \thesissrc{\S3.1, Figure 3.1(a)}
+\end{frame}
+
+
+% Source deck slide 23
+\begin{frame}{The lift embedding: one \(4\)-cycle per edge}
+ \begin{columns}[c,onlytextwidth]
+  \begin{column}{.45\textwidth}
+   \begin{center}\resizebox{.69\linewidth}{!}{\LiftSquareFig}\end{center}
+  \end{column}
+  \begin{column}{.52\textwidth}
+   Let \(H_m\) contain every layer \(G_i\) and an edge from each \(v\in G_i\) to its projection in \(G_{i-1}\).
+   \begin{block}{New basis cycles}
+   Every horizontal \(u'v'\in E(G_i)\) creates a \(4\)-cycle \(u'v'vuu'\).
+   \end{block}
+  \end{column}
+ \end{columns}
+ \[B_i=B_{i-1}\cup\{C_{u'v'}:u'v'\in E(G_i)\}.\]
+ \small A new cycle contains one unique horizontal edge; its number equals the increment in cycle rank.
+ \thesissrc{\S3.1, Figure 3.1(b)}
+\end{frame}
+
+
+% Source deck slide 24
+\begin{frame}{The surprising feasibility result}
+ \begin{block}{Theorem: large girth can coexist with a short embedding}
+ There are bounded-degree $G_m$ with $\girth(G_m)\to\infty$, and hosts $G_m\subseteq H_m$ such that
+ \[|V(H_m)|<2|V(G_m)|,\qquad\Delta(H_m)\le d+3.\]
+ \end{block}
+ \labelp{Why $G_m$ is not short} Every cycle in $G_m$ has length at least $\girth(G_m)$; hence every cycle basis has mean length at least $\girth(G_m)\to\infty$.
+ \vspace{.13cm}
+ \labelp{Why $H_m$ is short} Keep every lift layer and its projection edges. Add one $4$-cycle per horizontal edge:
+ \[W_i=W_{i-1}+4|E(G_i)|,\quad \nu_i=\nu_{i-1}+|E(G_i)|,\quad W_m/\nu_m=4+o(1).\]
+ \thesissrc{Theorem 3.1.1}
+\end{frame}
+
+
+% Source deck slide 25
+\begin{frame}{The mechanism behind the layered construction}
+ \begin{block}{Average stretch of a map $f:V(G)\to V(H)$}
+ \[\as(f;G,H)=\frac1{|E(G)|}\sum_{uv\in E(G)}d_H(f(u),f(v)).\]
+ \end{block}
+ \begin{columns}[c,onlytextwidth]
+  \begin{column}{.40\textwidth}
+   \centering\resizebox{.53\linewidth}{!}{\LiftSquareFig}
+  \end{column}
+  \begin{column}{.57\textwidth}
+   In an exact lift, the projected endpoints are adjacent and every new cycle has length $4$.
+
+   In a general map, connect each $u$ to $f(u)$ and close a new edge $uv$ through a shortest $H$-path.
+   \[\boxed{|C_{uv}|=3+d_H(f(u),f(v))}.\]
+  \end{column}
+ \end{columns}
+ \small\key{Condition:} bounded fibers preserve degree; bounded average stretch preserves total basis length.
+ \thesissrc{Definition 3.2.1; Theorem 3.2.1}
+\end{frame}
+
+
+% Source deck slide 26
+\begin{frame}{Short embeddings and low-stretch maps}
+ \begin{block}{Theorem (equivalence)}
+ A bounded-degree family admits uniformly bounded-degree, linear-size short embeddings iff each graph admits a bounded-fiber, \(O(1)\)-average-stretch map into a comparable-size bounded-degree graph with a short basis.
+ \end{block}
+ \labelp{Forward construction} Take disjoint \(G,H\), join \(u\) to \(f(u)\), retain a short basis \(B_H\), and add one cycle per \(uv\in E(G)\).
+ \[ w(B)\le w(B_H)+3|E(G)|+\sum_{uv\in E(G)}d_H(f(u),f(v))=O(n). \]
+ \labelp{Reverse} If \(G\subseteq H\), use the identity inclusion: each original edge has image distance \(1\).
+ \thesissrc{Theorem 3.2.1}
+\end{frame}
+
+
+% Source deck slide 27
+\begin{frame}{Counting edges: exponential growth versus distance penalty}
+ For a fixed $n$-vertex graph $H$ of maximum degree $d$, a sparse edge set $F$ of bounded total stretch satisfies $\sum_{uv\in F}d_H(u,v)=O(n)$.
+ \begin{block}{Fractional counting relaxation}
+ \[P_H=\left\{x\in[0,1]^{\binom n2}:\ \sum x_{uv}=\beta n,\ \sum d_H(u,v)x_{uv}\le\alpha n\right\}.\]
+ \end{block}
+ \labelp{Entropy bound} $\log |P_H\cap\{0,1\}^{\binom n2}|\le\max_{x\in P_H}\sum_{uv}h_2(x_{uv})$.
+ \vspace{.1cm}
+ \labelp{Key balancing step} Pairs at distance $k$ number at most $\frac{nd}{2}(d-1)^{k-1}$, while a dual penalty contributes $e^{-\mu k}$.
+ \[\mu>\log(d-1)\quad\Rightarrow\quad \sum_{k\ge1}O\!\left(n(d-1)^ke^{-\mu k}\right)=O(n).\]
+ \small\key{Insight:} there are too few inexpensive distant edges to produce more than exponentially many low-stretch edge sets.
+ \thesissrc{Section 3.3, entropy argument}
+\end{frame}
+
+
+% Source deck slide 28
+\begin{frame}{Folding explains the layering obstruction}
+ \vspace{.20cm}\centering\resizebox{.59\textwidth}{!}{\PreciseFoldFig}\par
+ \vspace{.14cm}
+ \labelp{Fold} Bounded fibers produce a quotient $G_f$; its edges have small total stretch in the base graph $H$.
+ \vspace{.08cm}
+ \labelp{Count} For each fixed $H$, the entropy bound permits only $e^{O(n)}$ such quotients; each has only $e^{O(n)}$ bounded-fiber unfoldings.
+ \vspace{.08cm}
+ \begin{block}{Scope}
+ This obstructs the \emph{bounded-fiber low-stretch layering scheme} for most regular graphs. It does \emph{not} rule out every possible short embedding.
+ \end{block}
+ \thesissrc{Section 3.4.2, Figure 3.2}
+\end{frame}
+
+
+% Source deck slide 29
+\begin{frame}{The main WCB insight: a layered certificate}
+ \begin{columns}[c,onlytextwidth]
+  \begin{column}{.51\textwidth}
+   \centering\resizebox{\linewidth}{!}{\WCBLayersFig}\par\scriptsize Tree edges: dark; $S_1$: teal; $S_2$: orange.
+  \end{column}
+  \begin{column}{.47\textwidth}
+   \begin{block}{Decomposition lemma}
+   In a \emph{minimum} WCB, pivot edges partition into $S_1,\dots,S_k$.
+   For each $e=uv\in S_i$,
+   \[C_e=e\cup P_{S_{<i}}(u,v),\]
+   where $P_{S_{<i}}$ is a shortest path in prior layers and uses an edge of $S_{i-1}$.
+   \end{block}
+  \end{column}
+ \end{columns}
+ \small\key{Proof idea:} order the pivots; assign each pivot a height from the largest height it uses. If a cycle's path were not shortest, replacing it would preserve the WCB property and reduce the total weight.
+ \thesissrc{Lemma 3.4.4}
+\end{frame}
+
+
+% Source deck slide 30
+\begin{frame}{Counting WCBs: charge each layer only once}
+ \begin{block}{Theorem (Chapter 3)}
+ For fixed $\Delta,\alpha$, the number of unlabeled $n$-vertex graphs with $\Delta(G)\le\Delta$ and a WCB of weight $\le\alpha n$ is $e^{O(n)}$.
+ \end{block}
+ \labelp{Step 1} Fix a bounded-degree certifying tree $T$ and the layer profiles $\beta_i=|S_i|$, $\alpha_i=\sum_{e\in S_i}|C_e|$.
+ \vspace{.08cm}
+ \labelp{Step 2} Shortest paths for $e\in S_i$ must touch $S_{i-1}$. The sharpened entropy bound therefore gives
+ \[\#\{S_i\}\le\exp\bigl(O(\alpha_i+\beta_i+\beta_{i-1})\bigr).\]
+ \labelp{Step 3} Multiplying layers, using $\sum_i\alpha_i=O(n)$, $\sum_i\beta_i=O(n)$, gives $e^{O(n)}$ choices. Trees and integer profiles add only $e^{O(n)}$.
+ \thesissrc{Theorem 3.4.5, Section 3.4.3}
+\end{frame}
+
+
+% Source deck slide 31
+\begin{frame}{The boundary of the structural results}
+ \begin{block}{Proved}
+ \[\#\{\Delta\text{-bounded }G:\ \WCB(G)\le\alpha n\}\le e^{O(n)}.\]
+ \end{block}
+ \begin{block}{Open}
+ Can $\WCB(G)/\MCB(G)$ grow without bound on bounded-degree graphs?
+ \end{block}
+ \vspace{.25cm}
+ \key{Why this matters:} a uniform bound $\WCB(G)\le C\,\MCB(G)$ in bounded degree would transfer the WCB counting theorem to short MCBs and settle the original counting question.
+ \thesissrc{Chapter 3, Conclusion}
+\end{frame}
+
+
+\section{Chapter 4: MST distribution}
+
+
+\begin{frame}{Why does the thesis turn to MST probabilities?}
+ A spanning tree $T$ defines \emph{two} different objects.
+ \begin{columns}[T,onlytextwidth]
+  \begin{column}{.48\textwidth}
+   \begin{block}{Fundamental cycles: geometry}
+   \[w(\mathrm{FCB}(T))=\sum_{uv\notin T}\bigl(1+d_T(u,v)\bigr).\]
+   Short bases are tied to small tree-path distances (stretch).
+   \end{block}
+  \end{column}
+  \begin{column}{.48\textwidth}
+   \begin{block}{Fundamental cuts: probability}
+   $T$ is an MST exactly when each tree edge is lighter than every competing edge crossing its fundamental cut.
+   \end{block}
+  \end{column}
+ \end{columns}
+ \vspace{.3cm}
+ \key{Common object:} the same tree $T$ is judged by its geometry and by the precedence constraints it imposes on random weights.
+ \small\textcolor{thesisGray}{This is a motivation, not a claimed general quantitative relation between stretch and MST probability.}
+ \thesissrc{Introduction and Chapters 1, 4}
+\end{frame}
+
+
+% Source deck slide 32
+\begin{frame}{Minimum spanning tree probability}
+ \begin{block}{Definition}
+ Assign i.i.d. continuous edge weights \((U_e)_{e\in E(G)}\). Let \(T=\MST(G,U)\), and write
+ \[ p_G(T)=\prob(\MST(G,U)=T). \]
+ \end{block}
+ \labelp{Order invariance} Only the relative ordering of the weights matters. We can replace the weights with a uniformly random permutation of \(E(G)\).
+ \labelp{Cut condition} The fixed tree \(T\) is the MST exactly when each \(e\in T\) precedes every other edge crossing its fundamental cut.
+ \thesissrc{\S4.1--4.2}
+\end{frame}
+
+
+% Source deck slide 33
+\begin{frame}{Exact probabilities are \(\#P\)-hard}
+ \begin{columns}[c,onlytextwidth]
+  \begin{column}{.40\textwidth}
+   \begin{center}\resizebox{.74\linewidth}{!}{\StarHardnessFig}\end{center}
+  \end{column}
+  \begin{column}{.57\textwidth}
+   \begin{block}{Reduction from linear extensions}
+   Given \(G=(V,E)\), add a center \(c\), connect it to all \(v\in V\), and take the star \(T\) as the prescribed MST.
+   \end{block}
+   \labelp{Precedence} For each original \(uv\in E\), both \(cu\) and \(cv\) must precede \(uv\).
+   These are exactly the incidence-poset relations.
+  \end{column}
+ \end{columns}
+ \[p_{G'}(T)=\frac{\#\operatorname{LE}(P_G)}{|E(G')|!}.\]
+ \small Counting linear extensions of graph-incidence posets is \(\#P\)-hard.
+ \thesissrc{Theorem 4.2.1}
+\end{frame}
+
+
+% Source deck slide 34
+\begin{frame}{The Lyons--Peres formula}
+ \begin{columns}[c,onlytextwidth]
+  \begin{column}{.46\textwidth}
+   \begin{center}\resizebox{\linewidth}{!}{\FundamentalCutFig}\end{center}
+  \end{column}
+  \begin{column}{.51\textwidth}
+   Order the \(n-1\) tree edges uniformly: \(\sigma\in S_{n-1}\).
+
+   Let \(\cut_T(\sigma_{\le i})\) be all edges of \(G\) joining different components of the forest after removing the first \(i\) tree edges.
+  \end{column}
+ \end{columns}
+ \begin{block}{Formula}
+ \[p_G(T)=(n-1)!\,\expect_{\sigma}\left[\prod_{i=1}^{n-1}\frac1{|\cut_T(\sigma_{\le i})|}\right].\]
+ \end{block}
+ \thesissrc{\S4.3.1}
+\end{frame}
+
+
+% Source deck slide 35
+\begin{frame}{Universal bounds in the complete graph}
+ \begin{block}{Lower bound for every \(T\subseteq K_n\)}
+ \[p_{K_n}(T)\ge\binom{\binom n2}{n-1}^{-1}
+ =\left(\frac{2+o(1)}{en}\right)^n.\]
+ \end{block}
+ \labelp{Proof} If the \(n-1\) lightest edges are precisely those of \(T\), Kruskal outputs \(T\).
+ \vspace{.22cm}
+ \begin{block}{The star (maximum probability)}
+ \[p_{K_n}(S_n)=\frac1{(2n-3)!!}
+ =\left(\frac{e+o(1)}{2n}\right)^n.\]
+ \end{block}
+ \thesissrc{\S4.3.1}
+\end{frame}
+
+
+% Source deck slide 36
+\begin{frame}{The path attains the lower bound}
+ \begin{block}{Theorem (Chapter 4)}
+ For the Hamiltonian path \(P_n\subseteq K_n\),
+ \[p_{K_n}(P_n)\le
+ \left(\frac{2}{en}\right)^n
+ \exp\bigl(O(\sqrt n\log n)\bigr).\]
+ \end{block}
+ Together with the universal lower bound,
+ \[\boxed{p_{K_n}(P_n)=\left(\frac{2}{en}\right)^n\exp(o(n))}.\]
+ \labelp{Known extremality} The path is the least likely spanning tree of \(K_n\); the result determines its exponential-scale probability.
+ \thesissrc{Theorem 4.3.4}
+\end{frame}
+
+
+% Source deck slide 37
+\begin{frame}{Complete graph: path fragmentation creates big cuts}
+ \centering\resizebox{.79\textwidth}{!}{\PathFragmentFig}\par
+ \small The red dashed edges are removed tree edges ($i=3$); the longest surviving run has $R_i=3$ edges.
+ \vspace{.15cm}
+ Let $C$ range over the components of $P_n\setminus\sigma_{\le i}$. The cut counts edges of $K_n$ joining different components:
+ \[|\cut_{P_n}(\sigma_{\le i})|=\binom n2-\sum_C\binom{|V(C)|}{2}
+ \ \ge\ \binom n2\left(1-\frac{R_i}{n-1}\right).\]
+ \vspace{.06cm}
+ \labelp{Meaning} Unless a long interval survives, the cut is nearly as large as the entire edge set of $K_n$.
+ \thesissrc{Section 4.3.2}
+\end{frame}
+
+
+% Source deck slide 38
+\begin{frame}{Path proof: long surviving runs are rare}
+ \centering\resizebox{.65\textwidth}{!}{\RareIntervalFig}\par
+ \vspace{.08cm}
+ \labelp{One certificate} If $R_t\ge a$, an interval $I$ of $a$ consecutive path edges was untouched by the first $t$ deletions. For fixed $I$,
+ \[\Pr(I\text{ untouched at time }t)\ \le\ \left(1-\frac{a}{n-1}\right)^t\le e^{-at/(n-1)}.\]
+ \labelp{All scales} Set $X_i=-\log(1-R_i/(n-1))$ and $N_j=\#\{i:X_i\ge j\delta\}$.
+ The nested interval certificates imply
+ \[\Pr(N_1\ge t_1,\dots,N_J\ge t_J)\le n^J e^{-\delta\sum_jt_j}.\]
+ \small Choosing $\delta=(\log n)/\sqrt n$ makes $J=O(\sqrt n)$ and bounds the multiplicative correction by $e^{O(\sqrt n\log n)}$.
+ \thesissrc{Section 4.3.2, joint-tail argument}
+\end{frame}
+
+
+% Source deck slide 39
+\begin{frame}{Grid: the double spiral starts with rings}
+ Let \(G_n\) be the \(N\times N\) grid, \(N=2r\), \(n=N^2\). The concentric cycles \(C_j\) partition its vertices.
+ \begin{columns}[T,onlytextwidth]
+  \begin{column}{.48\textwidth}
+   \centering\resizebox{.70\linewidth}{!}{\SpiralFigA}
+   \par\vspace{.08cm}\small (a) Alternating-color ring cycles
+  \end{column}
+  \begin{column}{.48\textwidth}
+   \centering\resizebox{.70\linewidth}{!}{\SpiralFigB}
+   \par\vspace{.08cm}\small (b) The vertices to flip (orange)
+  \end{column}
+ \end{columns}
+ \thesissrc{Figure 4.1(a)--(b), adapted in vector TikZ}
+\end{frame}
+
+
+% Source deck slide 40
+\begin{frame}{Grid: joining consecutive rings}
+ Flip one vertex \(v_j=(-j,-j+1)\) in each ring \(C_j\), proceeding outwards. A flip removes two monochromatic edges and creates one or two others.
+ \begin{columns}[T,onlytextwidth]
+  \begin{column}{.48\textwidth}
+   \centering\resizebox{.70\linewidth}{!}{\SpiralFigC}
+   \par\vspace{.08cm}\small (c) Flip \(v_2\)
+  \end{column}
+  \begin{column}{.48\textwidth}
+   \centering\resizebox{.70\linewidth}{!}{\SpiralFigD}
+   \par\vspace{.08cm}\small (d) Flip \(v_3\)
+  \end{column}
+ \end{columns}
+ \thesissrc{Figure 4.1(c)--(d), adapted in vector TikZ}
+\end{frame}
+
+
+% Source deck slide 41
+\begin{frame}{Grid: the final Hamiltonian path}
+ Once all flips are performed, remove the remaining edge \(f\) from the inner cycle and insert the central pivot edge \(e^\star\).
+ \begin{columns}[T,onlytextwidth]
+  \begin{column}{.48\textwidth}
+   \centering\resizebox{.70\linewidth}{!}{\SpiralFigE}
+   \par\vspace{.08cm}\small (e) Remove \(f\) (orange dashed)
+  \end{column}
+  \begin{column}{.48\textwidth}
+   \centering\resizebox{.70\linewidth}{!}{\SpiralFigF}
+   \par\vspace{.08cm}\small (f) Insert \(e^\star\) (green): \(D_n\)
+  \end{column}
+ \end{columns}
+ \thesissrc{Figure 4.1(e)--(f), adapted in vector TikZ}
+\end{frame}
+
+
+% Source deck slide 42
+\begin{frame}{Why the double spiral has the right cut structure}
+ \begin{columns}[c,onlytextwidth]
+  \begin{column}{.43\textwidth}
+   \centering\resizebox{.91\linewidth}{!}{\SpiralFigF}
+   \par\small Green: central pivot $e^\star$.
+  \end{column}
+  \begin{column}{.54\textwidth}
+   \labelp{Coloring} Delete $e^\star$: the red and blue spiral arms become separate paths.
+   \vspace{.14cm}
+   Every grid edge not in $D_n$, except one edge $f$, connects opposite colors.
+   \vspace{.14cm}
+   \begin{block}{Key property}
+   Every non-tree edge $e\ne f$ has its unique fundamental cycle through $e^\star$.
+   \end{block}
+  \end{column}
+ \end{columns}
+ \vspace{.07cm}
+ \small\key{This is the entire grid construction's purpose:} one pivot controls almost every non-tree edge.
+ \thesissrc{Section 4.4.1, Figure 4.1}
+\end{frame}
+
+
+% Source deck slide 43
+\begin{frame}{Grid: universal lower bound}
+ \[|E(G_n)|=2N(N-1),\qquad |E(D_n)|=n-1,\qquad m=(N-1)^2.\]
+ \begin{block}{For every spanning tree \(T\) of the grid}
+ \[p_{G_n}(T)\ge\binom{2N(N-1)}{n-1}^{-1}
+ =4^{-n}\exp(O(\sqrt n)).\]
+ \end{block}
+ \labelp{Proof} All tree edges may occur before all non-tree edges. This event forces Kruskal to output \(T\).
+ \vspace{.25cm}
+ \labelp{Question} Does the double spiral attain this lower bound to subexponential factors?
+ \thesissrc{Proposition 4.4.2}
+\end{frame}
+
+
+% Source deck slide 44
+\begin{frame}{Grid: a single surviving component controls the cut}
+ Delete $S\subseteq E(D_n)$, and let $U(S)$ count the surviving tree edges in the component containing $e^\star$ (set it to $0$ if the pivot was removed).
+ \begin{block}{Structural lemma}
+ At most $U(S)+2$ non-tree edges remain entirely inside components of $D_n\setminus S$.
+ \end{block}
+ \labelp{Proof} Except for $f$, every non-tree edge's tree path passes through $e^\star$. Hence if its endpoints are still connected, both are in the central path, with $U+1$ vertices. Each vertex touches at most two non-tree edges, giving $\le U+1$, plus $f$.
+ \vspace{.17cm}
+ \[\boxed{|\cut_{D_n}(\sigma_{\le i})|\ge m+i-U_i-2},\qquad m=(N-1)^2.\]
+ \small\key{Parallel to the path:} $U_i$ replaces the longest surviving run $R_i$.
+ \thesissrc{Lemma 4.4.2}
+\end{frame}
+
+
+% Source deck slide 45
+\begin{frame}{Grid probability: the path argument works again}
+ \labelp{Cut bounds} $|\cut_D(\sigma_{\le i})|\ge i$ always; for $i\ge2N$, use $m+i-U_i-2$.
+ \vspace{.10cm}
+ \labelp{Baseline} Factoring out $\prod_{i=1}^{n-1}(m+i)^{-1}=m!/(m+n-1)!$ gives the universal lower-bound scale
+ \[p_{G_n}(D_n)\ \le\ \frac{(n-1)!\,m!}{(m+n-1)!}\,\exp(O(\sqrt n\log n))
+ \ \mathbb E\prod_{i=2N}^{n-1}\left(1-\frac{U_i}{m+i}\right)^{-1}.\]
+ \labelp{Rare central runs} If $U_i$ is large, a long interval around $e^\star$ has avoided early random deletions. Interval certificates bound the expectation by $\exp(O(\sqrt n\log n))$.
+ \vspace{.12cm}
+ \small The additive $-2$ contributes only $e^{O(\log n)}$; early steps contribute $e^{O(\sqrt n\log n)}$.
+ \thesissrc{Section 4.4.3, proof of Theorem 4.4.3}
+\end{frame}
+
+
+% Source deck slide 46
+\begin{frame}{Double spiral: exponential-scale sharpness}
+ \begin{block}{Theorem (Chapter 4)}
+ For the double spiral \(D_n\) in the \(N\times N\) grid,
+ \[p_{G_n}(D_n)\le 4^{-n}\exp\bigl(O(\sqrt n\log n)\bigr).\]
+ \end{block}
+ With the universal lower bound,
+ \[\boxed{p_{G_n}(D_n)=4^{-n}\exp(o(n))}.\]
+ \vspace{.36cm}
+ \labelp{Parallel} In \(K_n\) the rare object is a long surviving run; in the grid it is a long surviving central component.
+ \thesissrc{Theorem 4.4.3}
+\end{frame}
+
+
+\section{Conclusions}
+
+
+% Source deck slide 47
+\begin{frame}{Three results and the shared idea}
+ \begin{block}{Hardness}
+ Local triangle completion encodes Vertex Cover:
+ $\mathrm{TBC}$ is APX-hard, and MCB-minimizing edge addition is NP-hard.
+ \end{block}
+ \begin{block}{Structure}
+ Low-stretch constructions can hide high-girth graphs inside short-basis hosts. Tree/layer certificates and entropy give only $e^{O(n)}$ graphs with short WCBs.
+ \end{block}
+ \begin{block}{Probability}
+ Fundamental cuts lead to $p_{K_n}(P_n)=(2/(en))^n e^{o(n)}$ and $p_{G_n}(D_n)=4^{-n}e^{o(n)}$ via rare-surviving-interval bounds.
+ \end{block}
+ \small\key{Open:} short-MCB counting; WCB/MCB gap; exploiting tree structure for MST-probability approximation.
+\end{frame}
+
+
+\section{Appendix: technical reduction lemmas}
+
+
+% Source deck slide 16
+\begin{frame}{First normalization: isolated \(K\)-edges}
+ \begin{columns}[c,onlytextwidth]
+  \begin{column}{.47\textwidth}
+   \begin{center}\resizebox{.84\linewidth}{!}{\SingleKComponentFig}\end{center}
+  \end{column}
+  \begin{column}{.51\textwidth}
+   Suppose \(ab\in K\) is an entire \(K\)-component in the original layer.
+   \begin{enumerate}
+    \item If \(a,b\) have no common neighbor in \(G\), delete \(ab\).
+    \item Otherwise the unique common neighbor \(w\) permits replacing \(ab\) by \(ww'\), or deleting \(ab\) if \(ww'\in K\).
+   \end{enumerate}
+  \end{column}
+ \end{columns}
+ \vspace{.07cm}
+ \small\labelp{Lemma} Feasibility is preserved and \(|K|\) does not increase; no size-two tree component remains in the \(G\)-layer.
+ \thesissrc{Lemma 2.3.6 and Algorithm 2}
+\end{frame}
+
+
+% Source deck slide 17
+\begin{frame}{Leaf lemma: triangle witnesses force protection}
+ \begin{block}{Lemma}
+ If \(v\) is a leaf of a normalized tree \(K\)-component contained in \(V(G)\), then \(N_G(v)\subseteq C_K\).
+ \end{block}
+ \vspace{.15cm}
+ \begin{center}\resizebox{.96\linewidth}{!}{\LeafCertificateFig}\end{center}
+ \small\labelp{Proof pattern} Assume \(w\in N_G(v)\setminus C_K\). Successive parity vectors \(E_{vw}\), \(E_{vw}+E_{uw}\), \(E_{vw}+E_{uw}+E_{wz}\) require new witnessing triangles; the bounded-degree and \(C_4\)-free constraints rule out the resulting configuration.
+ \thesissrc{Lemma 2.3.7 and its diagram table}
+\end{frame}
+
+
+% Source deck slide 18
+\begin{frame}{Degree-two leaf configuration}
+ \begin{columns}[c,onlytextwidth]
+  \begin{column}{.50\textwidth}
+   \begin{center}\resizebox{.94\linewidth}{!}{\DegreeTwoFig}\end{center}
+  \end{column}
+  \begin{column}{.47\textwidth}
+   \begin{block}{Lemma}
+   If \(\deg_G(v)=2\), at most one of its neighbors can be a leaf in a different tree \(K\)-component.
+   \end{block}
+   \labelp{Proof} The triangle certificates for \(uv\) and \(wv\) force \(u\bar v\) and \(w\bar v\), forming the forbidden \(4\)-cycle.
+  \end{column}
+ \end{columns}
+ \thesissrc{Lemma 2.3.8 and its diagram table}
+\end{frame}
+
+
+% Source deck slide 19
+\begin{frame}{Degree-three leaf configuration}
+ \begin{columns}[c,onlytextwidth]
+  \begin{column}{.49\textwidth}
+   \begin{center}\resizebox{.86\linewidth}{!}{\DegreeThreeFig}\end{center}
+  \end{column}
+  \begin{column}{.48\textwidth}
+   \begin{block}{Lemma}
+   If \(\deg_G(v)=3\) and two neighbors of \(v\) are leaves in other tree \(K\)-components, then all three neighbors lie in one \(K\)-component.
+   \end{block}
+   \labelp{Proof} Parity witnesses for the incident edges, together with the \(C_4\)-free condition, force the third neighbor into the same component.
+  \end{column}
+ \end{columns}
+ \thesissrc{Lemma 2.3.9 and its diagram table}
+\end{frame}
+
+\end{document}

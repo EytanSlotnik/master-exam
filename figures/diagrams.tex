@@ -1,0 +1,312 @@
+% Editable TikZ adaptations of the thesis graph figures.
+\tikzset{
+  graphVertex/.style={circle,fill=white,draw=thesisNavy,thick,inner sep=1pt,minimum size=6mm,font=\scriptsize},
+  graphOriginal/.style={circle,fill=thesisNavy,draw=thesisNavy,inner sep=2.2pt},
+  graphSub/.style={circle,fill=white,draw=thesisNavy,thick,inner sep=1.7pt},
+  gEdge/.style={thesisNavy,line width=1.35pt},
+  copyEdge/.style={thesisTeal,line width=1.7pt},
+  newEdge/.style={thesisOrange,line width=1.7pt},
+  wheelEdge/.style={green!50!black,line width=1.35pt},
+  kEdge/.style={thesisOrange,densely dashed,line width=2pt},
+  mapEdge/.style={thesisTeal,dashed,line width=1.55pt},
+}
+
+\newcommand{\TwoPartitionFig}{%
+\begin{tikzpicture}[scale=1.08]
+ \node[graphOriginal] (aL) at (-4.5,1.45) {};
+ \node[graphOriginal] (bL) at (-5.6,-1.05) {};
+ \node[graphOriginal] (cL) at (-3.4,-1.05) {};
+ \node[graphOriginal] (dL) at (-4.5,0) {};
+ \foreach \u/\v in {aL/bL,aL/cL,bL/cL,aL/dL,bL/dL,cL/dL}{\draw[gEdge] (\u)--(\v);}
+ \node[font=\small] at (-4.5,-1.9) {$K_4$};
+ \node[graphOriginal] (aR) at (1,1.45) {};
+ \node[graphOriginal] (bR) at (-.35,-1.05) {};
+ \node[graphOriginal] (cR) at (2.35,-1.05) {};
+ \node[graphOriginal] (dR) at (1,0) {};
+ \foreach \u/\v in {aR/bR,aR/cR,bR/cR,aR/dR,bR/dR,cR/dR}{%
+    \path (\u) -- (\v) coordinate[pos=.333] (qA) coordinate[pos=.667] (qB);
+    \draw[gEdge] (\u)--(qA)--(qB)--(\v);
+    \node[graphSub] at (qA) {}; \node[graphSub] at (qB) {};
+ }
+ \node[font=\small,align=center] at (1,-1.95) {2-partition of $K_4$};
+\end{tikzpicture}}
+
+\newcommand{\ReductionPanel}[1]{%
+\begin{tikzpicture}[x=1.04cm,y=1.04cm,baseline=(current bounding box.center)]
+ \ifnum#1=0
+   \foreach \i in {0,1,2,3}{\node[graphVertex,fill=white] (v\i) at (\i,0) {$\i$};}
+   \draw[gEdge] (v0)--(v1)--(v2)--(v3);
+ \else
+   \foreach \i in {0,1,2,3}{
+      \node[graphVertex] (v\i) at (\i,0) {$\i$};
+      \node[graphVertex,fill=thesisTeal!8] (p\i) at (\i,1.8) {$\i'$};
+   }
+   \draw[gEdge] (p0)--(p1)--(p2)--(p3);
+   \foreach \a/\b in {0/1,1/2,2/3}{
+      \draw[copyEdge] (v\a)--(p\b) (v\b)--(p\a);
+   }
+   \ifnum#1>1
+     \node[graphVertex,fill=green!14,draw=green!40!black] (r1) at (1,.9) {$r_1$};
+     \node[graphVertex,fill=green!14,draw=green!40!black] (r2) at (2,.9) {$r_2$};
+     \foreach \q in {p0,v1,p2,p1}{\draw[wheelEdge] (r1)--(\q);}
+     \foreach \q in {p1,v2,p3,p2}{\draw[wheelEdge] (r2)--(\q);}
+   \fi
+   \ifnum#1>2
+     \draw[newEdge] (v0)--(v1)--(v2)--(v3);
+   \fi
+ \fi
+\end{tikzpicture}}
+
+\newcommand{\FourCycleGadget}{%
+\begin{tikzpicture}[scale=1.1]
+ \node[graphVertex,fill=thesisOrange!10] (u) at (-1.7,-.9) {$u$};
+ \node[graphVertex,fill=thesisOrange!10] (v) at (1.7,-.9) {$v$};
+ \node[graphVertex,fill=thesisTeal!10] (up) at (1.7,1.2) {$u'$};
+ \node[graphVertex,fill=thesisTeal!10] (vp) at (-1.7,1.2) {$v'$};
+ \draw[newEdge] (u)--node[below,font=\scriptsize] {original $uv$}(v);
+ \draw[copyEdge] (v)--(up)--(vp)--(u);
+ \draw[kEdge] (u)--node[above,sloped,font=\scriptsize,fill=white,inner sep=1pt] {$uu'$}(up);
+ \node[font=\scriptsize,text=thesisTeal] at (0,1.62) {$u'v'$};
+ \node[font=\scriptsize] at (0,-1.75) {$C_{uv}=uv\oplus vu'\oplus u'v'\oplus v'u$};
+\end{tikzpicture}}
+
+\newcommand{\WheelFig}{%
+\begin{tikzpicture}[scale=1.05]
+ \foreach \i/\ang in {1/45,2/135,3/225,4/315}{\node[graphVertex,fill=thesisTeal!8] (v\i) at (\ang:1.5cm) {$v_{\i}$};}
+ \draw[gEdge] (v1)--(v2)--(v3)--(v4)--cycle;
+ \node[graphVertex,fill=green!15,draw=green!50!black] (r) at (0,0) {$r_C$};
+ \foreach \i in {1,2,3,4}{\draw[wheelEdge] (r)--(v\i);}
+\end{tikzpicture}}
+
+\newcommand{\SingleKComponentFig}{%
+\begin{tikzpicture}[scale=1.06]
+ \node[graphVertex] (a) at (-1.85,-.7) {$a$};
+ \node[graphVertex] (b) at (1.85,-.7) {$b$};
+ \node[graphVertex] (w) at (0,1.2) {$w$};
+ \node[graphVertex,fill=thesisTeal!10] (wp) at (0,-1.95) {$w'$};
+ \draw[gEdge] (a)--(w)--(b);
+ \draw[kEdge] (a)--node[below,font=\scriptsize] {delete}(b);
+ \draw[copyEdge] (wp)--(a) (wp)--(b);
+ \draw[thesisTeal,line width=2pt] (w)--node[right,font=\scriptsize] {replace}(wp);
+\end{tikzpicture}}
+
+\newcommand{\DegreeTwoFig}{%
+\begin{tikzpicture}[scale=.94]
+ \node[graphVertex] (u) at (-2,1) {$u$};
+ \node[graphVertex] (v) at (0,0) {$v$};
+ \node[graphVertex] (w) at (2,1) {$w$};
+ \node[graphVertex,fill=thesisOrange!14] (ub) at (-3,2) {$\bar u$};
+ \node[graphVertex,fill=thesisOrange!14] (vb) at (0,2.2) {$\bar v$};
+ \node[graphVertex,fill=thesisOrange!14] (wb) at (3,2) {$\bar w$};
+ \draw[gEdge] (u)--(v)--(w);
+ \foreach \a/\b in {u/ub,v/vb,w/wb}{\draw[kEdge] (\a)--(\b);}
+ \draw[copyEdge,very thick] (u)--(vb)--(w);
+ \node[font=\scriptsize,text=thesisRed] at (0,-.95) {$v-u-\bar v-w-v$ is a $4$-cycle};
+\end{tikzpicture}}
+
+\newcommand{\DegreeThreeFig}{%
+\begin{tikzpicture}[scale=.96]
+ \node[graphVertex] (v) at (0,0) {$v$};
+ \node[graphVertex] (u) at (-1.8,1.05) {$u$};
+ \node[graphVertex] (w) at (1.8,1.05) {$w$};
+ \node[graphVertex] (z) at (0,-1.75) {$z$};
+ \node[graphVertex,fill=thesisOrange!13] (ub) at (-2.65,2.25) {$\bar u$};
+ \node[graphVertex,fill=thesisOrange!13] (vb) at (1.08,-.8) {$\bar v$};
+ \node[graphVertex,fill=thesisOrange!13] (wb) at (2.65,2.25) {$\bar w$};
+ \draw[gEdge] (v)--(u) (v)--(w) (v)--(z);
+ \foreach \a/\b in {u/ub,v/vb,w/wb}{\draw[kEdge] (\a)--(\b);}
+\end{tikzpicture}}
+
+\newcommand{\PairedRemovalFig}{%
+\begin{tikzpicture}[scale=1.05]
+ \node[draw=thesisTeal!70,rounded corners=5pt,fill=thesisTeal!5,minimum width=3.0cm,minimum height=2.45cm] at (-2,0) {};
+ \node[draw=thesisOrange!65,rounded corners=5pt,fill=thesisOrange!5,minimum width=2.35cm,minimum height=2.45cm] at (2,0) {};
+ \node[graphVertex,fill=thesisTeal!17] (u) at (-2.75,.6) {$u$};
+ \node[graphVertex,fill=thesisTeal!17] (w) at (-1.25,.6) {$w$};
+ \node[graphVertex] (a) at (-2,-.48) {$a$};
+ \node[graphVertex,fill=thesisOrange!15] (v) at (1.5,.55) {$v$};
+ \node[graphVertex] (b) at (2.5,-.55) {$b$};
+ \draw[kEdge] (u)--(a)--(w) (v)--(b);
+ \draw[gEdge] (u)--(v)--(w);
+ \foreach \q in {u,w}{\draw[thesisRed,line width=1.5pt] ($ (\q)+(-.25,-.25) $)--($ (\q)+(.25,.25) $) ($ (\q)+(-.25,.25) $)--($ (\q)+(.25,-.25) $);}
+ \node[font=\scriptsize,text=thesisTeal] at (-2,-1.55) {$A_0$};
+ \node[font=\scriptsize,text=thesisOrange] at (2,-1.55) {$A_1$};
+\end{tikzpicture}}
+
+\newcommand{\LiftLayersFig}{%
+\begin{tikzpicture}[scale=.94]
+ \foreach \x/\k in {-3.5/0,0/1,3.5/2}{
+  \draw[rounded corners=6pt,draw=thesisNavy!25,fill=thesisNavy!2] (\x-1.28,-1.35) rectangle (\x+1.28,1.35);
+  \node[font=\small] at (\x,1.72) {$G_{\k}$};
+ }
+ \foreach \i in {0,...,2}{
+    \node[graphOriginal] (A\i) at ({-3.5+1.03*cos(90+120*\i)},{1.02*sin(90+120*\i)}) {};
+ }
+ \foreach \i in {0,...,2}{\pgfmathtruncatemacro{\j}{mod(\i+1,3)}\draw[gEdge] (A\i)--(A\j);}
+ \foreach \i in {0,...,5}{\node[graphOriginal] (B\i) at ({.98*cos(90+60*\i)},{.98*sin(90+60*\i)}) {};}
+ \foreach \i in {0,...,5}{\pgfmathtruncatemacro{\j}{mod(\i+1,6)}\draw[gEdge] (B\i)--(B\j);}
+ \foreach \i in {0,...,11}{\node[graphOriginal] (C\i) at ({3.5+1.05*cos(90+30*\i)},{1.05*sin(90+30*\i)}) {};}
+ \foreach \i in {0,...,11}{\pgfmathtruncatemacro{\j}{mod(\i+1,12)}\draw[gEdge] (C\i)--(C\j);}
+ \draw[-{Stealth[length=3mm]},mapEdge] (-2.1,.1)--node[above,font=\scriptsize] {$2$-lift}(-1.42,.1);
+ \draw[-{Stealth[length=3mm]},mapEdge] (1.44,.1)--node[above,font=\scriptsize] {$2$-lift}(2.15,.1);
+ \node[font=\scriptsize,text=thesisGray] at (-3.5,-1.7) {$C_3$};
+ \node[font=\scriptsize,text=thesisGray] at (0,-1.7) {$C_6$};
+ \node[font=\scriptsize,text=thesisGray] at (3.5,-1.7) {$C_{12}$};
+\end{tikzpicture}}
+
+\newcommand{\LiftSquareFig}{%
+\begin{tikzpicture}[scale=1.1]
+ \node[graphVertex] (u) at (-1.4,1.35) {$u$};
+ \node[graphVertex] (v) at (1.4,1.35) {$v$};
+ \node[graphVertex,fill=thesisTeal!12] (up) at (-1.4,-.8) {$u'$};
+ \node[graphVertex,fill=thesisTeal!12] (vp) at (1.4,-.8) {$v'$};
+ \draw[gEdge] (u)--node[above,font=\scriptsize] {lower layer}(v);
+ \draw[copyEdge] (up)--node[below,font=\scriptsize] {lifted edge}(vp);
+ \draw[mapEdge] (up)--(u) (vp)--(v);
+ \node[font=\small] at (0,-1.67) {$|C_{u'v'}|=4$};
+\end{tikzpicture}}
+
+\newcommand{\FoldUnfoldFig}{%
+\begin{tikzpicture}[scale=.9]
+  \foreach \i in {0,...,7}{\node[graphOriginal] (a\i) at ({-4.5+1.35*cos(45*\i)},{1.35*sin(45*\i)}) {};}
+  \foreach \i in {0,...,7}{\pgfmathtruncatemacro{\j}{mod(\i+1,8)}\draw[gEdge] (a\i)--(a\j);}
+  \node[font=\small] at (-4.5,-1.9) {$G=C_8$};
+  \foreach \i in {0,...,3}{\node[graphOriginal] (b\i) at ({1.7*cos(90*\i)},{1.35*sin(90*\i)}) {};}
+  \draw[gEdge] (b0)--(b1)--(b2)--(b3)--cycle;
+  \node[font=\small] at (0,-1.9) {$G_f=C_4$};
+  \foreach \i in {0,...,3}{\node[graphOriginal] (c\i) at ({3+.76*\i},0) {};}
+  \draw[gEdge] (c0)--(c1)--(c2)--(c3);
+  \node[font=\small] at (4.14,-1.9) {$H=P_4$};
+  \draw[-{Stealth[length=3mm]},mapEdge] (-2.75,.35)--node[above,font=\scriptsize] {fold}(-1.8,.35);
+  \draw[-{Stealth[length=3mm]},mapEdge] (1.95,.35)--node[above,font=\scriptsize] {stretch}(2.8,.35);
+\end{tikzpicture}}
+
+\newcommand{\WCBLayersFig}{%
+\begin{tikzpicture}[x=1.12cm,y=.92cm]
+ \foreach \i in {0,...,5}{\node[graphVertex] (v\i) at (\i,0) {\tiny $\i$};}
+ \draw[gEdge] (v0)--(v1)--(v2)--(v3)--(v4)--(v5);
+ \draw[copyEdge] (v0) to[out=75,in=105,looseness=.7] node[above,font=\scriptsize] {$S_1$} (v3);
+ \draw[copyEdge] (v2) to[out=75,in=105,looseness=.7] node[above,font=\scriptsize] {$S_1$} (v5);
+ \draw[newEdge] (v0) to[out=-70,in=-110,looseness=.65] node[below,font=\scriptsize] {$e\in S_2$} (v5);
+\end{tikzpicture}}
+
+\newcommand{\PathFragmentFig}{%
+\begin{tikzpicture}[x=.67cm,y=.7cm]
+ \foreach \i in {0,...,15}{\node[circle,fill=thesisNavy,inner sep=2pt] (q\i) at (\i,0) {};}
+ \foreach \i in {0,...,14}{\pgfmathtruncatemacro{\j}{\i+1}\ifnum\i=3 \draw[thesisRed,dashed,line width=1.8pt] (q\i)--(q\j);\else\ifnum\i=7 \draw[thesisRed,dashed,line width=1.8pt] (q\i)--(q\j);\else\ifnum\i=11 \draw[thesisRed,dashed,line width=1.8pt] (q\i)--(q\j);\else\draw[gEdge] (q\i)--(q\j);\fi\fi\fi}
+ \draw[thesisTeal,line width=2.4pt,rounded corners] (q4.north west) ++(-.18,.25) rectangle ($ (q7.south east)+(.18,-.25) $);
+ \node[font=\scriptsize,text=thesisTeal] at (5.5,1.02) {surviving run};
+ \node[font=\scriptsize,text=thesisRed] at (7.3,-.86) {removed tree edges};
+\end{tikzpicture}}
+
+\newcommand{\StarHardnessFig}{%
+\begin{tikzpicture}[scale=1.18]
+ \node[graphVertex,fill=thesisNavy,text=white] (c) at (0,0) {$c$};
+ \node[graphVertex] (u) at (-2,1.45) {$u$};
+ \node[graphVertex] (v) at (2,1.45) {$v$};
+ \node[graphVertex] (w) at (-2,-1.45) {$w$};
+ \node[graphVertex] (x) at (2,-1.45) {$x$};
+ \foreach \q in {u,v,w,x}{\draw[copyEdge] (c)--(\q);}
+ \draw[newEdge,densely dashed] (u)--(v) (v)--(x) (x)--(w);
+ \node[font=\scriptsize,text=thesisOrange] at (0,2.15) {edges of original graph};
+ \node[font=\scriptsize,text=thesisTeal] at (0,-2.15) {tree = new star edges};
+\end{tikzpicture}}
+
+\newcommand{\FundamentalCutFig}{%
+\begin{tikzpicture}[scale=1.08]
+ \node[graphVertex] (a) at (-2.8,.7) {$a$};
+ \node[graphVertex] (b) at (-1.5,1.4) {$b$};
+ \node[graphVertex] (c) at (-1.5,-.65) {$c$};
+ \node[graphVertex] (d) at (1.35,1.4) {$d$};
+ \node[graphVertex] (e) at (2.8,.7) {$e$};
+ \node[graphVertex] (f) at (1.35,-.65) {$f$};
+ \draw[copyEdge] (a)--(b) (a)--(c) (d)--(e) (d)--(f);
+ \draw[thesisRed,line width=2.7pt] (b)--node[above,font=\scriptsize,black] {$t$}(d);
+ \foreach \u/\v in {a/e,a/f,b/e,c/f}{\draw[thesisOrange,dashed,line width=1pt] (\u)--(\v);}
+ \node[font=\scriptsize] at (0,-1.65) {orange edges cross the fundamental cut of $t$};
+\end{tikzpicture}}
+
+\newcommand{\LeafCertificateFig}{%
+\begin{tikzpicture}[scale=.9]
+ \foreach \shift/\idx in {-4.1/1,0/2,4.1/3}{
+  \begin{scope}[xshift=\shift cm]
+   \node[graphVertex] (v\idx) at (0,0) {$v$};
+   \node[graphVertex] (u\idx) at (-1,1.05) {$u$};
+   \node[graphVertex] (w\idx) at (1.3,0) {$w$};
+   \node[graphVertex] (z\idx) at (1.3,1.2) {$z$};
+   \draw[kEdge] (u\idx)--(v\idx);
+   \draw[gEdge] (v\idx)--(w\idx);
+   \ifnum\idx>1
+     \draw[gEdge] (u\idx)--(w\idx);
+   \fi
+   \ifnum\idx>2
+     \draw[gEdge] (w\idx)--(z\idx);
+     \draw[kEdge] (u\idx)--(z\idx);
+   \fi
+   \node[font=\scriptsize,text=thesisTeal] at (0,-.9)
+   {\ifnum\idx=1 $E_{vw}$\else\ifnum\idx=2 $E_{vw}+E_{uw}$\else $E_{vw}+E_{uw}+E_{wz}$\fi\fi};
+  \end{scope}
+ }
+\end{tikzpicture}}
+
+\newcommand{\CoverExtractionFig}{%
+\begin{tikzpicture}[x=1.15cm,y=1.1cm]
+ \node[graphVertex,fill=thesisOrange!16] (u) at (0,0) {$u$};
+ \node[graphVertex] (v) at (2,0) {$v$};
+ \node[graphVertex,fill=thesisTeal!9] (up) at (2,1.55) {$u'$};
+ \node[graphVertex,fill=thesisTeal!9] (vp) at (0,1.55) {$v'$};
+ \draw[newEdge] (u)--(v);
+ \draw[copyEdge] (v)--(up)--(vp)--(u);
+ \draw[kEdge] (u) to[out=-100,in=-80,looseness=.6] node[below,font=\scriptsize] {$K$ incident to $u$} (vp);
+ \node[font=\scriptsize,text=thesisNavy] at (1,-1.05) {any triangle through $uv$ needs $K$ at $u$ or $v$};
+\end{tikzpicture}}
+
+% A small exact cycle-space example: the square with one diagonal has rank two.
+\newcommand{\ShortBasisFig}{%
+\begin{tikzpicture}[x=1cm,y=1cm]
+ \foreach \n/\x/\y in {a/0/2,b/2.5/2,c/2.5/0,d/0/0}{\node[graphVertex] (\n) at (\x,\y) {$\n$};}
+ \draw[gEdge] (a)--(b)--(c)--(d)--cycle;
+ \draw[thesisOrange,line width=2.3pt] (a)--(c);
+ \draw[thesisTeal,line width=1.6pt] (a)--(b)--(c);
+ \draw[thesisRed,line width=1.6pt] (a)--(d)--(c);
+ \node[font=\scriptsize,text=thesisNavy] at (1.25,-.65) {$\nu(G)=5-4+1=2$};
+ \node[font=\scriptsize,align=center,text=thesisGray] at (1.25,-1.18) {two triangles span the cycle space\\ total length $3+3=6$};
+\end{tikzpicture}}
+
+% Actual C8 -> C4 cover: the eight vertices are identified in pairs a1/a2,...,d1/d2.
+\newcommand{\PreciseFoldFig}{%
+\begin{tikzpicture}[x=.89cm,y=.89cm]
+ \foreach \name/\i in {a_1/0,b_1/1,c_1/2,d_1/3,a_2/4,b_2/5,c_2/6,d_2/7}{
+   \pgfmathtruncatemacro{\ii}{\i}
+   \node[graphVertex,minimum size=5mm,font=\tiny] (q\ii) at ({-4+1.50*cos(90-45*\i)},{1.5*sin(90-45*\i)}) {$\name$};
+ }
+ \foreach \i in {0,...,7}{\pgfmathtruncatemacro{\j}{mod(\i+1,8)}\draw[gEdge] (q\i)--(q\j);}
+ \node[font=\scriptsize] at (-4,-2.0) {$G=C_8$ (pairs $a_1/a_2,\ldots,d_1/d_2$)};
+ \foreach \name/\i in {a/0,b/1,c/2,d/3}{\node[graphVertex,minimum size=5mm] (p\i) at ({1.4*cos(90-90*\i)},{1.4*sin(90-90*\i)}) {$\name$};}
+ \draw[copyEdge] (p0)--(p1)--(p2)--(p3)--cycle;
+ \node[font=\scriptsize] at (0,-2.0) {$G_f=C_4$};
+ \foreach \name/\i in {a/0,b/1,c/2,d/3}{\node[graphVertex,minimum size=5mm] (h\i) at ({2.65+.82*\i},0) {$\name$};}
+ \draw[gEdge] (h0)--(h1)--(h2)--(h3);
+ \draw[thesisOrange,dashed,line width=1.5pt] (h0) to[bend left=42] node[above,font=\tiny] {distance $3$} (h3);
+ \node[font=\scriptsize] at (3.90,-2.0) {$H=P_4$};
+ \draw[-{Stealth[length=2.3mm]},mapEdge] (-2.32,.12)--node[above,font=\scriptsize] {fold}(-1.8,.12);
+ \draw[-{Stealth[length=2.3mm]},mapEdge] (1.70,.12)--node[above,font=\scriptsize] {measure stretch}(2.35,.12);
+\end{tikzpicture}}
+
+\newcommand{\ExcessTreeFig}{%
+\begin{tikzpicture}[x=1.25cm,y=1.15cm]
+ \foreach \n/\x in {u/0,v/1.7,w/3.4}{\node[graphVertex] (\n) at (\x,0) {$\n$};}
+ \draw[kEdge] (u)--(v)--(w);
+ \node[font=\small] at (1.7,-.75) {three original-layer endpoints, two added edges};
+ \node[font=\scriptsize,text=thesisRed] at (1.7,-1.25) {$|V(A)|=|K\cap E(A)|+1$};
+\end{tikzpicture}}
+
+\newcommand{\RareIntervalFig}{%
+\begin{tikzpicture}[x=.6cm,y=.62cm]
+ \foreach \i in {0,...,17}{\node[circle,fill=thesisNavy,inner sep=1.65pt] (q\i) at (\i,0) {};}
+ \foreach \i in {0,...,16}{\pgfmathtruncatemacro{\j}{\i+1}\draw[gEdge] (q\i)--(q\j);}
+ \draw[thesisOrange,line width=3pt,opacity=.85] (q4)--(q5)--(q6)--(q7)--(q8)--(q9)--(q10)--(q11);
+ \draw[thesisTeal,line width=1.15pt,decorate,decoration={brace,amplitude=5pt,mirror}]
+   ([yshift=-7pt]q4.south)--node[below=7pt,font=\scriptsize,text=thesisTeal] {no removed edges among these $a$ tree edges}([yshift=-7pt]q11.south);
+ \node[font=\scriptsize,text=thesisGray] at (8.5,1.0) {large surviving run at time $t$};
+\end{tikzpicture}}
